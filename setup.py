@@ -37,11 +37,11 @@ REQUIRES_PYTHON = ">=3.7.0"
 REQUIRED = []
 REQUIRED_TEST = []
 
-about = {
-    "__version__": subprocess.check_output(
-        ["git", "describe", "--tags"], universal_newlines=True
-    ).strip()
-}
+# about = {
+#     "__version__": subprocess.check_output(
+#         ["git", "describe", "--tags"], universal_newlines=True
+#     ).strip()
+# }
 
 try:
     with io.open(os.path.join(root, "README.md"), encoding="utf-8") as f:
@@ -97,9 +97,9 @@ class UploadCommand(Command):
         self.status("Uploading the package to PyPI via Twine…")
         os.system("twine upload dist/*")
 
-        self.status("Pushing git tags…")
-        os.system("git tag {0}".format(about["__version__"]))
-        os.system("git push --tags")
+        # self.status("Pushing git tags…")
+        # os.system("git tag {0}".format(about["__version__"]))
+        # os.system("git push --tags")
 
         sys.exit()
 
@@ -107,7 +107,8 @@ class UploadCommand(Command):
 # *************** INSTALL *****************
 setup(
     name=NAME,
-    version=about["__version__"],
+    # version=about["__version__"],
+    version="0.0.1",
     description=DESCRIPTION,
     long_description=long_description,
     long_description_content_type="text/markdown",
