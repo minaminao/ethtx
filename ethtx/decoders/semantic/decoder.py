@@ -14,6 +14,7 @@
 # not licensed under the Apache 2.0 license. When using or reproducing the code, please remove
 # the trademark and/or other branding elements.
 
+import logging
 from typing import Dict, List, Optional
 
 from ethtx.decoders.semantic.abc import ISemanticDecoder
@@ -33,6 +34,7 @@ from ethtx.models.decoded_model import (
 )
 from ethtx.models.objects_model import BlockMetadata
 
+log = logging.getLogger(__name__)
 
 class SemanticDecoder(ISemanticDecoder):
     def decode_transaction(
@@ -66,6 +68,7 @@ class SemanticDecoder(ISemanticDecoder):
         tx_metadata: DecodedTransactionMetadata,
         chain_id: str,
     ) -> DecodedTransactionMetadata:
+        log.info("decode_metadata")
         return SemanticMetadataDecoder(repository=self.repository).decode(
             block_metadata=block_metadata, tx_metadata=tx_metadata, chain_id=chain_id
         )
@@ -76,6 +79,7 @@ class SemanticDecoder(ISemanticDecoder):
         tx_metadata: DecodedTransactionMetadata,
         proxies: Optional[Dict[str, Proxy]] = None,
     ) -> DecodedEvent:
+        log.info("decode_event")
         return SemanticEventsDecoder(repository=self.repository).decode(
             events=event, tx_metadata=tx_metadata, proxies=proxies or {}
         )
@@ -86,6 +90,7 @@ class SemanticDecoder(ISemanticDecoder):
         tx_metadata: DecodedTransactionMetadata,
         proxies: Optional[Dict[str, Proxy]] = None,
     ) -> List[DecodedEvent]:
+        log.info("decode_events")
         return SemanticEventsDecoder(repository=self.repository).decode(
             events=events, tx_metadata=tx_metadata, proxies=proxies or {}
         )
@@ -96,6 +101,7 @@ class SemanticDecoder(ISemanticDecoder):
         tx_metadata: DecodedTransactionMetadata,
         proxies: Optional[Dict[str, Proxy]] = None,
     ) -> DecodedCall:
+        log.info("decode_calls")
         return SemanticCallsDecoder(repository=self.repository).decode(
             call=call, tx_metadata=tx_metadata, proxies=proxies or {}
         )
@@ -106,6 +112,7 @@ class SemanticDecoder(ISemanticDecoder):
         tx_metadata: DecodedTransactionMetadata,
         proxies: Optional[Dict[str, Proxy]] = None,
     ) -> DecodedCall:
+        log.info("decode_call")
         return SemanticCallsDecoder(repository=self.repository).decode(
             call=call, tx_metadata=tx_metadata, proxies=proxies or {}
         )
@@ -113,6 +120,7 @@ class SemanticDecoder(ISemanticDecoder):
     def decode_transfers(
         self, transfers: List[DecodedTransfer], tx_metadata: DecodedTransactionMetadata
     ) -> List[DecodedTransfer]:
+        log.info("decode_transfers")
         return SemanticTransfersDecoder(repository=self.repository).decode(
             transfers=transfers, tx_metadata=tx_metadata
         )
@@ -120,6 +128,7 @@ class SemanticDecoder(ISemanticDecoder):
     def decode_balances(
         self, balances: List[DecodedBalance], tx_metadata: DecodedTransactionMetadata
     ) -> List[DecodedBalance]:
+        log.info("decode_balances")
         return SemanticBalancesDecoder(repository=self.repository).decode(
             balances=balances, tx_metadata=tx_metadata
         )

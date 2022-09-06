@@ -51,9 +51,11 @@ class DecoderService:
 
         self.semantic_decoder.repository.record()
         # read a raw transaction from a node
+        log.info("get_full_transaction")
         transaction = self.web3provider.get_full_transaction(
             tx_hash=tx_hash, chain_id=chain_id
         )
+        log.info("get_block")
         # read a raw block from a node
         block = Block.from_raw(
             w3block=self.web3provider.get_block(
@@ -63,14 +65,18 @@ class DecoderService:
         )
 
         # prepare lists of delegations to properly decode delegate-calling contracts
+        log.info("get_delegations")
         delegations = self.get_delegations(transaction.root_call)
+        log.info("get_proxies")
         proxies = self.get_proxies(delegations, chain_id)
 
+        log.info("abi_decoder")
         # decode transaction using ABI
         abi_decoded_tx = self.abi_decoder.decode_transaction(
             block=block, transaction=transaction, proxies=proxies, chain_id=chain_id
         )
 
+        log.info("semantic_decoder")
         # decode transaction using additional semantics
         semantically_decoded_tx = self.semantic_decoder.decode_transaction(
             block=block.metadata,

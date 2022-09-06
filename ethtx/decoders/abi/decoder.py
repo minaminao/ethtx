@@ -81,6 +81,7 @@ class ABIDecoder(IABIDecoder):
         proxies: Optional[Dict[str, Proxy]] = None,
         chain_id: Optional[str] = None,
     ) -> Optional[DecodedCall]:
+        log.info("decode_calls")
         return ABICallsDecoder(
             repository=self._repository, chain_id=chain_id or self._default_chain
         ).decode(
@@ -110,6 +111,7 @@ class ABIDecoder(IABIDecoder):
         proxies: Optional[Dict[str, Proxy]] = None,
         chain_id: Optional[str] = None,
     ) -> List[DecodedEvent]:
+        log.info("decode_events")
         return ABIEventsDecoder(
             repository=self._repository, chain_id=chain_id or self._default_chain
         ).decode(
@@ -161,6 +163,7 @@ class ABIDecoder(IABIDecoder):
         chain_id: str,
         proxies: Optional[Dict[str, Proxy]] = None,
     ) -> DecodedTransaction:
+        log.info("_decode_transaction")
 
         full_decoded_transaction = DecodedTransaction(
             block_metadata=block,

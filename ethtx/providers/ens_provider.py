@@ -39,7 +39,15 @@ class ENSProviderBase(ABC):
 class Web3ENSProvider(ENSProviderBase):
     ns: ENS
 
+    def __init__(self):
+        self.cache_name_to_address = {}
+        self.cache_address_to_name = {}
+
     def name(self, provider: Web3, address: str) -> str:
+        if address in self.cache_address_to_name:
+            name = self.cache_address_to_name[address]
+            return name if name else address
+
         ns = self._set_provider(provider)
         check_sum_address = Web3.toChecksumAddress(address)
 
@@ -52,14 +60,24 @@ class Web3ENSProvider(ENSProviderBase):
             )
             name = None
 
+        self.cache_name_to_address[name] = address
+        self.cache_address_to_name[address] = name
+
         if name:
             log.info("ENS resolved an address: %s to name: %s", address, name)
 
         return name if name else address
 
     def address(self, provider: Web3, name: str) -> str:
+        if name in self.cache_name_to_address:
+            address = self.cache_name_to_address[name]
+            return address if address else name
+
         ns = self._set_provider(provider)
         address = ns.address(name=name)
+
+        self.cache_name_to_address[name] = address
+        self.cache_address_to_name[address] = name
 
         if address:
             log.info("ENS resolved name: %s to address: %s", name, address)

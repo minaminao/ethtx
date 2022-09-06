@@ -26,13 +26,21 @@ from ethtx.models.semantics_model import (
 from ethtx.providers.semantic_providers import SemanticsRepository
 from ethtx.providers.signature_provider import SignatureProvider, FourByteProvider
 
+import copy
+
 log = logging.getLogger(__name__)
 
-
+cache_signature_obj = {}
 def decode_function_abi_with_repository(
     signature: str, repository: SemanticsRepository
 ) -> Tuple[bool, Optional[FunctionSemantics]]:
-    signature_obj = repository.get_most_used_signature(signature_hash=signature)
+    global cache_signature_obj
+    if signature in cache_signature_obj:
+        signature_obj = cache_signature_obj[signature]
+    else:
+        signature_obj = repository.get_most_used_signature(signature_hash=signature)
+        cache_signature_obj[signature] = copy.deepcopy(signature_obj)
+
     if signature_obj:
         log.info(
             "Function (signature: %s, name: %s) guessed from SemanticsRepository.",
@@ -100,15 +108,22 @@ def upsert_guessed_function_semantics(
         )
     )
 
-
+cache_return_decode_event_abi_name_with_external_source = {}
 def decode_event_abi_name_with_external_source(
     signature: str, _provider: Optional[SignatureProvider] = FourByteProvider
 ) -> Tuple[bool, str]:
+    global cache_return_decode_event_abi_name_with_external_source
+
+    if signature in cache_return_decode_event_abi_name_with_external_source:
+        ret = cache_return_decode_event_abi_name_with_external_source[signature]
+        return ret
+
     events = _provider.get_event(signature=signature)
 
     for event in events:
 
         if not event:
+            cache_return_decode_event_abi_name_with_external_source[signature] = (False, signature)
             return False, signature
 
         event_name = event.get("name")
@@ -118,8 +133,10 @@ def decode_event_abi_name_with_external_source(
                 signature,
                 event_name,
             )
+            cache_return_decode_event_abi_name_with_external_source[signature] = (True, event.get("name", signature))
             return True, event.get("name", signature)
 
+    cache_return_decode_event_abi_name_with_external_source[signature] = (False, signature)
     return False, signature
 
 
